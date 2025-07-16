@@ -1,0 +1,76 @@
+.services-section {
+  background: #f8f9fa;
+}
+
+.services-section h2,
+.services-section h4,
+.services-section h5 {
+  color: #1a1a1a;
+}
+
+.services-section p,
+.services-section li {
+  font-size: 0.95rem;
+}
+
+.nav-pills .nav-link {
+  border-radius: 50px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
+  color: #333;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #ffc107 !important;
+  color: #000;
+  border-color: #ffcd39;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #ffeeba;
+  color: #000;
+}
+
+.tab-content {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.tab-content ul {
+  padding-left: 1.2rem;
+}
+
+.tab-content li::marker {
+  color: #f39c12;
+}
+
+.slick-slider h5 {
+  background: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  margin: 1rem 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.slick-slider h5:hover {
+  background: #fffae6;
+  transform: translateY(-3px);
+}
+
+.services-section .btn-warning {
+  border-radius: 50px;
+  padding: 0.6rem 2rem;
+  font-size: 1rem;
+}
+
+.services-section .btn-warning:hover {
+  background-color: #e0a800;
+  color: #fff;
+}

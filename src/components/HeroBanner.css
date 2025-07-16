@@ -1,0 +1,17 @@
+.hero-section {
+  min-height: 100vh;
+  padding-top: 100px;
+  background: 
+              url('/assets/images/home_image_1.jpeg') no-repeat center center;
+  background-size: cover;
+}
+
+.highlight {
+  color: #f39c12;
+}
+
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+}

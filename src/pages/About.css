@@ -1,0 +1,11 @@
+.about-section h3 {
+  font-size: 1.75rem;
+}
+
+.about-section .rounded-4 {
+  border-radius: 1rem;
+}
+
+.about-section .shadow-sm {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+}

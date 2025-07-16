@@ -1,0 +1,25 @@
+.testimonials-section .testimonial-card {
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.testimonials-section .testimonial-card:hover {
+  transform: translateY(-4px);
+}
+
+.slick-dots li button:before {
+  color: #f39c12 !important; /* orange indicators */
+}
+
+.slick-slide {
+  padding: 10px 0;
+}
+
+@media (max-width: 767.98px) {
+  .slick-slide > div {
+    margin: 0 auto;
+    max-width: 90%;
+  }
+}

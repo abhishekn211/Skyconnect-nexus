@@ -1,0 +1,401 @@
+/* == NAVBAR WRAPPER STYLING == */
+.navbar-wrapper {
+  position: fixed;
+  top: 20px;
+  width: 100%;
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* only the navbar gets clicks */
+}
+
+/* == MODERN DESKTOP NAVBAR == */
+.modern-navbar {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 40px;
+  max-width: 1100px;
+  width: 95%;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+/* == Inner Container (to control logo/text/toggle alignment) == */
+.navbar-inner-container {
+  display: flex !important; /* Ensure it's always flex */
+  align-items: center; /* Vertically align items */
+  /* Default justify-content is handled by media queries below */
+}
+
+/* == LINK STYLING == */
+.nav-link {
+  font-size: 1rem;
+  color: #333;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover,
+.active-link {
+  color: #0d6efd !important;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #0d6efd;
+  transition: 0.3s;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after,
+.active-link::after {
+  width: 100%;
+}
+
+/* == CONTACT BUTTON (DESKTOP) == */
+.btn-warning {
+  background-color: #f39c12;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+  background-color: #e69500;
+}
+
+/* == LOGO IMAGE == */
+.logo-img {
+  max-height: 40px; /* Default max-height for desktop logo */
+  width: auto; /* Default auto width */
+  object-fit: contain;
+}
+
+/* == Brand Text (Name and Slogan) Container == */
+.brand-text-center-container {
+  flex-direction: column; /* Name and slogan stack */
+  text-align: center; /* Center the text within its container */
+  /* This will be shown/hidden and adjusted by media queries */
+}
+
+.brand-name-main {
+  font-size: 1.4rem; /* Default desktop size */
+  font-weight: 700;
+  line-height: 1.2;
+  color: #212529;
+}
+
+.brand-slogan {
+  font-size: 0.85rem; /* Default desktop size */
+  color: #6c757d;
+  line-height: 1.2;
+  margin-top: -0.2em;
+  font-weight: 400;
+}
+
+/* == NAVBAR TOGGLER (HAMBURGER) == */
+.navbar-toggler {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Custom Toggle Icons */
+.navbar-toggle-icon,
+.navbar-close-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  color: #333;
+}
+
+/* --- MEDIA QUERIES FOR SPECIFIC LAYOUTS --- */
+@media (min-width: 992px) {
+  /* Desktop Layout (>991.98px) */
+  .navbar-inner-container {
+    justify-content: flex-start; /* Brand (logo+text) on left, nav links centered, button right */
+  }
+
+  /* Make sure the main nav links are centered */
+  .navbar-collapse .nav {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Make sure the contact button is on the right */
+  .navbar-collapse .btn-warning {
+    margin-left: auto; /* Push to right of nav */
+  }
+
+  /* Logo brand on desktop should not grow */
+  .navbar-logo-brand {
+    margin-right: 0.5rem; /* Space between logo and text */
+  }
+
+  /* Brand text container (name + slogan) setup for desktop */
+  .brand-text-center-container {
+    display: flex !important; /* Visible on desktop */
+    flex-grow: 0; /* Don't stretch */
+    justify-content: flex-start; /* Align its content left */
+    flex-direction: column; /* Stack name and slogan */
+    text-align: left; /* Text alignment within its container */
+    order: 0; /* Ensures it stays after the logo */
+  }
+  .brand-name-main {
+    font-size: 1.4rem; /* Desktop size */
+  }
+  .brand-slogan {
+    font-size: 0.85rem; /* Desktop size */
+    display: block !important; /* Ensure slogan is visible */
+  }
+
+  /* Hide the navbar toggle on desktop */
+  .navbar-toggler {
+    display: none !important;
+  }
+}
+
+@media (min-width: 516px) and (max-width: 991.98px) {
+  /* Tablet/Mid-size (516px to 991.98px) */
+  /* Logo left, Name+Slogan centered, Hamburger right */
+  .modern-navbar {
+    border-radius: 16px;
+    margin-top: 10px;
+  }
+
+  .navbar-inner-container {
+    justify-content: space-between; /* Logo left, text/slogan centered, toggle right */
+  }
+
+  .navbar-logo-brand {
+    /* Logo stays on the left */
+    margin-right: 0; /* No auto margin to push the text away excessively */
+    order: 0; /* Ensure logo is first */
+  }
+
+  .brand-text-center-container {
+    display: flex !important; /* Ensure it's visible */
+    flex-grow: 1; /* Make it take available space to center its content */
+    justify-content: center; /* Center the name and slogan */
+    padding: 0 1rem; /* Add some padding around the text */
+    flex-direction: column; /* Stack name and slogan */
+    order: 1; /* Position it between logo and toggle */
+  }
+  .brand-name-main {
+    font-size: 1.2rem; /* Adjust size for mid-screens */
+  }
+  .brand-slogan {
+    font-size: 0.75rem; /* Adjust size for mid-screens */
+    display: block !important; /* Ensure slogan is visible */
+  }
+
+  .navbar-toggler {
+    display: block !important; /* Show hamburger */
+    order: 2; /* Ensure toggle is last */
+  }
+
+  /* Style for the collapsed menu */
+  .navbar-collapse {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 1040;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid #eee;
+    border-radius: 0 0 12px 12px;
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .navbar-collapse:not(.show) {
+    display: none !important;
+  }
+
+  .navbar-collapse .nav-link,
+  .navbar-collapse .btn-warning {
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    color: #333; /* Default link color */
+  }
+  .navbar-collapse .btn-warning {
+    background: none;
+    border: none;
+    color: #0d6efd; /* Button acts like a link */
+  }
+  .navbar-collapse .btn-warning:hover {
+    background-color: transparent;
+    color: #0056b3;
+  }
+}
+
+@media (max-width: 518px) {
+  /* Mobile Devices (<518px) - This applies to screens between 370px and 518px */
+  .modern-navbar {
+    border-radius: 16px;
+    margin-top: 10px;
+  }
+
+  .navbar-inner-container {
+    justify-content: space-between; /* Logo left, name centered, toggle right */
+  }
+
+  /* --- ADJUSTMENTS FOR MOBILE LOGO IMAGE --- */
+  .logo-img {
+    max-height: 50px !important; /* Increased max-height for better slogan visibility */
+    width: auto !important; /* Allow width to scale proportionally */
+  }
+
+  .navbar-logo-brand {
+    margin-right: 0;
+    order: 0;
+  }
+
+  .brand-text-center-container {
+    display: flex !important;
+    flex-grow: 1;
+    justify-content: center;
+    padding: 0 0.5rem;
+    flex-direction: column;
+    order: 1;
+  }
+  .brand-name-main {
+    font-size: 1.05rem;
+  }
+  .brand-slogan {
+    display: none !important; /* Hide slogan on mobile */
+  }
+
+  .navbar-toggler {
+    display: block !important;
+    order: 2;
+  }
+
+  /* Style for the collapsed menu */
+  .navbar-collapse {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 1040;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid #eee;
+    border-radius: 0 0 12px 12px;
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .navbar-collapse:not(.show) {
+    display: none !important;
+  }
+
+  .navbar-collapse .nav-link,
+  .navbar-collapse .btn-warning {
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    color: #333;
+  }
+  .navbar-collapse .btn-warning {
+    background: none;
+    border: none;
+    color: #0d6efd;
+  }
+  .navbar-collapse .btn-warning:hover {
+    background-color: transparent;
+    color: #0056b3;
+  }
+}
+
+@media (max-width: 388px) {
+  /* Smaller Mobile Devices (<388px) - This applies to screens between 370px and 388px */
+  .modern-navbar {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .navbar-inner-container {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  .logo-img {
+    max-height: 45px !important;
+    width: auto !important;
+  }
+
+  .navbar-logo-brand {
+    flex-shrink: 0;
+    margin-right: 0.2rem;
+    padding: 0;
+  }
+
+  .brand-text-center-container {
+    /* On these screens, the name and slogan are already very small/hidden.
+       We'll ensure they don't cause layout issues if they were to try and display. */
+    display: flex !important; /* Keep it as flex container for layout purposes */
+    flex-grow: 1; /* Allow it to take space */
+    justify-content: center;
+    padding: 0 0.2rem;
+    flex-direction: column;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  .brand-name-main {
+    font-size: 0.9rem; /* Name becomes smaller */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand-slogan {
+    display: none !important; /* Slogan is already hidden here */
+  }
+
+  .navbar-toggler {
+    flex-shrink: 0;
+    padding: 0.2rem 0.4rem;
+    margin-left: 0.2rem;
+  }
+
+  .navbar-collapse {
+    padding: 0.8rem 0;
+  }
+  .navbar-collapse .nav-link,
+  .navbar-collapse .btn-warning {
+    font-size: 1rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+@media (max-width: 372px) {
+  /* NEW Media Query: For devices < 370px (e.g., iPhone SE first gen) */
+  .modern-navbar {
+    padding-left: 0.3rem; /* Even tighter padding */
+    padding-right: 0.3rem;
+  }
+
+  .logo-img {
+    max-height: 40px !important; /* Slightly smaller logo for extreme narrowness */
+    width: auto !important;
+  }
+
+  .navbar-logo-brand {
+    margin-right: 0.1rem; /* Minimal margin */
+  }
+
+  .brand-text-center-container {
+    /* This is the key change for <370px: Hide the entire name/slogan container */
+    display: none !important;
+  }
+
+  .navbar-toggler {
+    padding: 0.15rem 0.3rem; /* Even smaller toggler padding */
+    margin-left: 0.1rem; /* Minimal margin */
+  }
+}
