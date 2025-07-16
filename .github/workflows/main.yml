@@ -9,44 +9,44 @@ on:
       - main # Trigger on pull requests to the main branch
 
 jobs:
-  build_and_deploy: # Renamed job to reflect direct deployment
+  build_and_deploy: # Job ka naam 'build_and_deploy' rakha hai
     name: Build and Deploy React App
-    runs-on: ubuntu-latest # Use the latest Ubuntu environment
+    runs-on: ubuntu-latest # Latest Ubuntu environment use karenge
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4 # Action to checkout your repository code
+      uses: actions/checkout@v4 # Repository code checkout karenge
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '24' # IMPORTANT: Specify the Node.js version you use (e.g., '18', '20', '22')
-        cache: 'npm' # Cache npm dependencies for faster builds
+        node-version: '20' # Apne Node.js version ko yahaan specify karein (jaise '18', '20', '22')
+        cache: 'npm' # npm dependencies ko cache karenge tez builds ke liye
 
     - name: Install dependencies
-      run: npm ci # 'npm ci' for clean install in CI environments
+      run: npm ci # Clean install karenge dependencies ka
 
-    # Removed the 'Run tests' step as it was causing the "Missing script: test" error.
-    # If you add testing later (e.g., with Vitest), re-enable this step after configuring your package.json.
+    # 'Run tests' step ko hata diya gaya hai kyunki "Missing script: test" error aa rahi thi.
+    # Agar aap baad mein testing set karte hain (jaise Vitest ke saath), toh is step ko phir se enable kar sakte hain
+    # apne package.json mein 'test' script configure karne ke baad.
 
     - name: Build React App (Vite)
-      run: npm run build # Vite build command, outputs to 'dist' folder
+      run: npm run build # Vite build command chalayenge, jo 'dist' folder mein output deta hai
 
-    # --- Deployment to Hostinger via FTP/SFTP ---
-    # This step uses the built artifacts directly without a separate upload/download artifact step.
-    # This simplifies the workflow for direct deployment.
+    # --- Hostinger par Deployment (FTP/SFTP ke zariye) ---
+    # Yeh step directly built artifacts (files) ko use karta hai bina alag se artifact upload/download kiye.
     - name: Deploy via FTP/SFTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # A popular GitHub Action for FTP deployment
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # FTP deployment ke liye use hone wala GitHub Action
+
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        protocol: sftp # Recommended protocol for Hostinger for secure transfer
-        local-dir: ./dist/ # IMPORTANT: Deploy from the 'dist' folder
-        # remote-dir: /public_html/ # Your target directory on Hostinger. Adjust if deploying to a subdomain or subdirectory.
-        # Example for a subdirectory: remote-dir: /public_html/my-react-app/
-        # Example for a subdomain (e.g., blog.yourdomain.com): remote-dir: /domains/blog.yourdomain.com/public_html/
-        remote-dir: /public_html/ # **IMPORTANT: Verify this path with your Hostinger File Manager**
-        delete-excluded: false # Set to 'false' if your .htaccess is outside 'dist' and you don't want it deleted.
-                               # If your .htaccess is copied INTO 'dist' by Vite config, you can set this to 'true'.
-        dangerous-clean-slate: false # Always keep this as 'false' unless you fully understand the risks.
+        server: ${{ secrets.FTP_SERVER }}  # GitHub Secrets se FTP server address
+        username: ${{ secrets.FTP_USERNAME }} # GitHub Secrets se FTP username
+        password: ${{ secrets.FTP_PASSWORD }} # GitHub Secrets se FTP password
+        protocol: ftps # Yahaan 'ftps' use karein 'sftp' ki jagah (action ke error message ke mutabik)
+        local-dir: ./dist/ # Local directory jahaan se files deploy honi hain (Vite ka build output)
+        server-dir: /public_html/ # IMPORTANT: Remote directory jahaan files upload honi hain (Hostinger par).
+                                 # Agar subdomain ya sub-directory mein deploy kar rahe hain, toh yeh path badalna hoga.
+                                 # Example: remote-dir: /public_html/my-react-app/
+        delete-excluded: false # Ise 'false' rakhein safety ke liye, khaas kar agar .htaccess 'dist' ke bahar hai.
+                               # 'true' tabhi karein jab sure ho ki aapki build process saari zaroori files 'dist' mein copy karti hai.
+        dangerous-clean-slate: false # Ise hamesha 'false' rakhein, jab tak aap iska matlab poori tarah na samajh lein.
