@@ -9,8 +9,8 @@ on:
       - main # Trigger on pull requests to the main branch
 
 jobs:
-  build_and_test:
-    name: Build and Test React App
+  build_and_deploy: # Renamed job to reflect direct deployment
+    name: Build and Deploy React App
     runs-on: ubuntu-latest # Use the latest Ubuntu environment
 
     steps:
@@ -20,56 +20,33 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '24' # IMPORTANT: Specify the Node.js version you use (e.g., 18, 20, 22)
+        node-version: '24' # IMPORTANT: Specify the Node.js version you use (e.g., '18', '20', '22')
         cache: 'npm' # Cache npm dependencies for faster builds
 
     - name: Install dependencies
       run: npm ci # 'npm ci' for clean install in CI environments
 
-    - name: Run tests
-      run: npm test -- --watchAll=false # Run your tests. '--watchAll=false' is often needed in CI.
-      # If you don't have tests, you can remove or comment out this step.
-      # Check your 'scripts' in package.json. If 'test' script doesn't exist, remove this.
+    # Removed the 'Run tests' step as it was causing the "Missing script: test" error.
+    # If you add testing later (e.g., with Vitest), re-enable this step after configuring your package.json.
 
     - name: Build React App (Vite)
-      run: npm run build # Vite build command
-
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: vite-dist-build # Artifact name (changed from react-build to vite-dist-build for clarity)
-        path: dist # IMPORTANT: Vite builds to 'dist' folder, not 'build'
-
-  deploy:
-    name: Deploy to Hosting
-    needs: build_and_test # This job depends on 'build_and_test' completing successfully
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Download build artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: vite-dist-build # Download the artifact
-        path: ./dist # IMPORTANT: Download into a 'dist' directory locally for deployment
+      run: npm run build # Vite build command, outputs to 'dist' folder
 
     # --- Deployment to Hostinger via FTP/SFTP ---
-    # You will need to set up secrets in your GitHub repository settings.
+    # This step uses the built artifacts directly without a separate upload/download artifact step.
+    # This simplifies the workflow for direct deployment.
     - name: Deploy via FTP/SFTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # A popular GitHub Action for FTP deployment
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        protocol: ftps # Use ftps or sftp for secure transfer (Hostinger prefers SFTP)
+        protocol: sftp # Recommended protocol for Hostinger for secure transfer
         local-dir: ./dist/ # IMPORTANT: Deploy from the 'dist' folder
         # remote-dir: /public_html/ # Your target directory on Hostinger. Adjust if deploying to a subdomain or subdirectory.
         # Example for a subdirectory: remote-dir: /public_html/my-react-app/
         # Example for a subdomain (e.g., blog.yourdomain.com): remote-dir: /domains/blog.yourdomain.com/public_html/
         remote-dir: /public_html/ # **IMPORTANT: Verify this path with your Hostinger File Manager**
-        delete-excluded: true # Set to true if you want to remove old files not in your new build. Be careful!
-        # If your .htaccess is NOT in your 'dist' folder (which is typical for React SPAs),
-        # then 'delete-excluded: true' might delete it. In that case, either move .htaccess
-        # into your source and configure Vite to copy it to 'dist', or set 'delete-excluded: false'.
-        # If 'delete-excluded: true', ensure you manage your .htaccess outside the automated deployment or ensure it's copied.
-        # For simplicity, if .htaccess is fixed and outside 'dist', you can keep 'delete-excluded: false'.
-        dangerous-clean-slate: false # Do not wipe the entire remote directory unless you know what you're doing
+        delete-excluded: false # Set to 'false' if your .htaccess is outside 'dist' and you don't want it deleted.
+                               # If your .htaccess is copied INTO 'dist' by Vite config, you can set this to 'true'.
+        dangerous-clean-slate: false # Always keep this as 'false' unless you fully understand the risks.
