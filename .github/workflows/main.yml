@@ -9,44 +9,39 @@ on:
       - main # Trigger on pull requests to the main branch
 
 jobs:
-  build_and_deploy: # Job ka naam 'build_and_deploy' rakha hai
+  build_and_deploy:
     name: Build and Deploy React App
-    runs-on: ubuntu-latest # Latest Ubuntu environment use karenge
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4 # Repository code checkout karenge
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20' # Apne Node.js version ko yahaan specify karein (jaise '18', '20', '22')
-        cache: 'npm' # npm dependencies ko cache karenge tez builds ke liye
+        node-version: '20' # Confirm your Node.js version here
+        cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci # Clean install karenge dependencies ka
-
-    # 'Run tests' step ko hata diya gaya hai kyunki "Missing script: test" error aa rahi thi.
-    # Agar aap baad mein testing set karte hain (jaise Vitest ke saath), toh is step ko phir se enable kar sakte hain
-    # apne package.json mein 'test' script configure karne ke baad.
+      run: npm ci
 
     - name: Build React App (Vite)
-      run: npm run build # Vite build command chalayenge, jo 'dist' folder mein output deta hai
+      run: npm run build
 
-    # --- Hostinger par Deployment (FTP/SFTP ke zariye) ---
-    # Yeh step directly built artifacts (files) ko use karta hai bina alag se artifact upload/download kiye.
-    - name: Deploy via FTP/SFTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # FTP deployment ke liye use hone wala GitHub Action
-
+    # --- Deployment to Hostinger via SFTP (Recommended for Hostinger) ---
+    - name: Deploy via SFTP
+      # CHANGED: Using a different action that supports SFTP
+      uses: secretory/action-sftp-deploy@v1.4.0 # A robust SFTP deployment action
       with:
-        server: ${{ secrets.FTP_SERVER }}  # GitHub Secrets se FTP server address
-        username: ${{ secrets.FTP_USERNAME }} # GitHub Secrets se FTP username
-        password: ${{ secrets.FTP_PASSWORD }} # GitHub Secrets se FTP password
-        protocol: ftps # Yahaan 'ftps' use karein 'sftp' ki jagah (action ke error message ke mutabik)
-        local-dir: ./dist/ # Local directory jahaan se files deploy honi hain (Vite ka build output)
-        server-dir: /public_html/ # IMPORTANT: Remote directory jahaan files upload honi hain (Hostinger par).
-                                 # Agar subdomain ya sub-directory mein deploy kar rahe hain, toh yeh path badalna hoga.
-                                 # Example: remote-dir: /public_html/my-react-app/
-        delete-excluded: false # Ise 'false' rakhein safety ke liye, khaas kar agar .htaccess 'dist' ke bahar hai.
-                               # 'true' tabhi karein jab sure ho ki aapki build process saari zaroori files 'dist' mein copy karti hai.
-        dangerous-clean-slate: false # Ise hamesha 'false' rakhein, jab tak aap iska matlab poori tarah na samajh lein.
+        host: ${{ secrets.FTP_SERVER }}      # CHANGED: 'server' is now 'host'
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        port: 22                             # ADDED: Default SFTP port (22). Confirm with Hostinger if different.
+        localDir: ./dist/                    # CHANGED: 'local-dir' is now 'localDir'
+        remoteDir: /public_html/             # CHANGED: 'server-dir' is now 'remoteDir' (or 'deploy_path' in some actions)
+                                             # **IMPORTANT: Verify this path with your Hostinger File Manager**
+        # exclude: "**.git*"                 # Optional: Exclude patterns (if needed)
+        # delete-remote-files: true          # Optional: Delete files on remote that are not in local. Use with CAUTION!
+                                             # Consider leaving this commented out or 'false' if your .htaccess is not in 'dist'.
+                                             # If you use this, also add: args: --delete --checksum --verbose
