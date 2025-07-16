@@ -1,0 +1,74 @@
+name: React CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+  pull_request:
+    branches:
+      - main # Trigger on pull requests to the main branch
+
+jobs:
+  build_and_test:
+    name: Build and Test React App
+    runs-on: ubuntu-latest # Use the latest Ubuntu environment
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4 # Action to checkout your repository code
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Specify the Node.js version your project uses (e.g., 18, 20, 22)
+        cache: 'npm' # Cache npm dependencies for faster builds
+
+    - name: Install dependencies
+      run: npm ci # 'npm ci' for clean install in CI environments
+
+    - name: Run tests
+      run: npm test -- --watchAll=false # Run your tests. '--watchAll=false' is often needed in CI.
+      # If you don't have tests, you can remove or comment out this step.
+      # Or, if your tests require a browser environment, you might need more complex setup (e.g., with Playwright or Puppeteer)
+
+    - name: Build React App
+      run: npm run build # Create the production build
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: react-build
+        path: dist # The 'build' folder created by 'npm run build'
+
+  deploy:
+    name: Deploy to Hosting
+    needs: build_and_test # This job depends on 'build_and_test' completing successfully
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: react-build
+        path: ./build # Download the artifact into a 'build' directory
+
+    # --- Deployment to Hostinger via FTP/SFTP ---
+    # Hostinger often provides FTP/SFTP access. This is a common way to deploy.
+    # You will need to set up secrets in your GitHub repository settings.
+    - name: Deploy via FTP/SFTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # A popular GitHub Action for FTP deployment
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        protocol: ftps # Use ftps or sftp for secure transfer (Hostinger prefers SFTP)
+        local-dir: ./build/ # The local directory containing your built files
+        # remote-dir: /public_html/ # Your target directory on Hostinger. Adjust if deploying to a subdomain or subdirectory.
+        # Example for a subdirectory: remote-dir: /public_html/my-react-app/
+        # Example for a subdomain (e.g., blog.yourdomain.com): remote-dir: /domains/blog.yourdomain.com/public_html/
+        # Check your Hostinger File Manager for the exact path.
+        remote-dir: /public_html/ # **IMPORTANT: Verify this path with your Hostinger File Manager**
+        delete-excluded: false # Don't delete files not in local-dir
+        dangerous-clean-slate: false # Do not wipe the entire remote directory unless you know what you're doing
+        # If your .htaccess file is in the build folder (less common for React but possible if customized),
+        # ensure it's not excluded or deleted by other settings.
