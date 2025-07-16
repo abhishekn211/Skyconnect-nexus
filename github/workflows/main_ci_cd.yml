@@ -1,4 +1,4 @@
-name: React CI/CD Pipeline
+name: Vite React CI/CD Pipeline
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20' # Specify the Node.js version your project uses (e.g., 18, 20, 22)
+        node-version: '24' # IMPORTANT: Specify the Node.js version you use (e.g., 18, 20, 22)
         cache: 'npm' # Cache npm dependencies for faster builds
 
     - name: Install dependencies
@@ -29,16 +29,16 @@ jobs:
     - name: Run tests
       run: npm test -- --watchAll=false # Run your tests. '--watchAll=false' is often needed in CI.
       # If you don't have tests, you can remove or comment out this step.
-      # Or, if your tests require a browser environment, you might need more complex setup (e.g., with Playwright or Puppeteer)
+      # Check your 'scripts' in package.json. If 'test' script doesn't exist, remove this.
 
-    - name: Build React App
-      run: npm run build # Create the production build
+    - name: Build React App (Vite)
+      run: npm run build # Vite build command
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: react-build
-        path: dist # The 'build' folder created by 'npm run build'
+        name: vite-dist-build # Artifact name (changed from react-build to vite-dist-build for clarity)
+        path: dist # IMPORTANT: Vite builds to 'dist' folder, not 'build'
 
   deploy:
     name: Deploy to Hosting
@@ -49,11 +49,10 @@ jobs:
     - name: Download build artifact
       uses: actions/download-artifact@v4
       with:
-        name: react-build
-        path: ./build # Download the artifact into a 'build' directory
+        name: vite-dist-build # Download the artifact
+        path: ./dist # IMPORTANT: Download into a 'dist' directory locally for deployment
 
     # --- Deployment to Hostinger via FTP/SFTP ---
-    # Hostinger often provides FTP/SFTP access. This is a common way to deploy.
     # You will need to set up secrets in your GitHub repository settings.
     - name: Deploy via FTP/SFTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # A popular GitHub Action for FTP deployment
@@ -62,13 +61,15 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         protocol: ftps # Use ftps or sftp for secure transfer (Hostinger prefers SFTP)
-        local-dir: ./build/ # The local directory containing your built files
+        local-dir: ./dist/ # IMPORTANT: Deploy from the 'dist' folder
         # remote-dir: /public_html/ # Your target directory on Hostinger. Adjust if deploying to a subdomain or subdirectory.
         # Example for a subdirectory: remote-dir: /public_html/my-react-app/
         # Example for a subdomain (e.g., blog.yourdomain.com): remote-dir: /domains/blog.yourdomain.com/public_html/
-        # Check your Hostinger File Manager for the exact path.
         remote-dir: /public_html/ # **IMPORTANT: Verify this path with your Hostinger File Manager**
-        delete-excluded: false # Don't delete files not in local-dir
+        delete-excluded: true # Set to true if you want to remove old files not in your new build. Be careful!
+        # If your .htaccess is NOT in your 'dist' folder (which is typical for React SPAs),
+        # then 'delete-excluded: true' might delete it. In that case, either move .htaccess
+        # into your source and configure Vite to copy it to 'dist', or set 'delete-excluded: false'.
+        # If 'delete-excluded: true', ensure you manage your .htaccess outside the automated deployment or ensure it's copied.
+        # For simplicity, if .htaccess is fixed and outside 'dist', you can keep 'delete-excluded: false'.
         dangerous-clean-slate: false # Do not wipe the entire remote directory unless you know what you're doing
-        # If your .htaccess file is in the build folder (less common for React but possible if customized),
-        # ensure it's not excluded or deleted by other settings.
